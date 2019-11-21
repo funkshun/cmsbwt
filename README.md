@@ -6,14 +6,25 @@ and is currently under development.
 It currently implements a subset of functionality and does not utilize memory mapping when loading BWTs.
 This leads to failed opens on large data sets.
 
-## Installation and Setup
+## Installation and Testing
 
 Clone this repository to begin the installation. 
+
+### Without Tests
 
     cd cmsbwt
     mkdir build && cd build
     cmake ..
     make && make install
+    
+### With Tests
+
+    cd cmsbwt
+    mkdir build && cd build
+    TEST_ARGS=/path/to/comp_msbwt.npy && cmake ..
+    make && make test
+    # All tests pass
+    make install
     
 The installation will place the library and header files under /usr/local.
 If this location is not already visible to linkers, you can add it to the appropriate paths.

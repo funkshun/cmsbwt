@@ -25,7 +25,7 @@ int main(int argc, char* argv[]) {
 
   string_util::initializeStringUtil();
 
-  char* bwtFN = "/home/a2/comp_msbwt.npy";
+  char* bwtFN = argv[1];
   BaseBWT * rle = new RLE_BWT(bwtFN, 9);
 
 
