@@ -16,6 +16,9 @@ set_target_properties(cmsbwt PROPERTIES PUBLIC_HEADER "${HEADERS}")
 enable_testing()
 add_subdirectory(tests)
 
+# Examples
+add_subdirectory(examples)
+
 # sudo make install to apply
 install(TARGETS cmsbwt
   LIBRARY DESTINATION /usr/local/lib
