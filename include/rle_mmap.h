@@ -35,7 +35,7 @@ private:
 public:
   uint64_t size;
   // constructor and destructor
-  RLE_MMAP(string inFN, uint8_t bitPower = 8, bool useMmap = false);
+  RLE_MMAP(string inFN, uint8_t bitPower = 8);
   ~RLE_MMAP();
 
   // query sub-routines
