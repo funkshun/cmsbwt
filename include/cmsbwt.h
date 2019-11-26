@@ -1,7 +1,5 @@
-#include "alignment_util.h"
-#include "bit_array.h"
-#include "file_iterators.h"
 #include "string_util.h"
 #include "base_bwt.h"
 #include "csa_bwt.h"
 #include "rle_bwt.h"
+#include "rle_mmap.h"

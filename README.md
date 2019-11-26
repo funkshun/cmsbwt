@@ -21,7 +21,7 @@ Clone this repository to begin the installation.
 
     cd cmsbwt
     mkdir build && cd build
-    TEST_ARGS=/path/to/comp_msbwt.npy && cmake ..
+    TEST_ARGS=/path/to/comp_msbwt.npy cmake ..
     make && make test
     # All tests pass
     make install
