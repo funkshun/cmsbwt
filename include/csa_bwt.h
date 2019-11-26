@@ -1,32 +1,33 @@
 #ifndef CSA_BWT_H
 #define CSA_BWT_H
 
-//C headers
+// C headers
 #include <stdint.h>
 
-//C++ headers
+// C++ headers
 
-//custom headers
-#include "bit_array.h"
+// custom headers
 #include "base_bwt.h"
+#include "bit_array.h"
 
 using namespace std;
 
-class CSA_BWT : public BaseBWT{
+class CSA_BWT : public BaseBWT {
 private:
-    //constructFMIndex()
-    vector<BitArray*> csa;
-    
-    //these functions build all auxiliary structures required for the FM-index lookups
-    void constructFMIndex(bool storeDN);
-    
+  // constructFMIndex()
+  vector<BitArray *> csa;
+
+  // these functions build all auxiliary structures required for the FM-index
+  // lookups
+  void constructFMIndex(bool storeDN);
+
 public:
-    //constructor and destructor
-    CSA_BWT(string inFN, bool storeD=true);
-    ~CSA_BWT();
-    
-    //query sub-routines
-    bwtRange constrainRange(uint8_t sym, bwtRange inRange);
+  // constructor and destructor
+  CSA_BWT(string inFN, bool storeD = true);
+  ~CSA_BWT();
+
+  // query sub-routines
+  bwtRange constrainRange(uint8_t sym, bwtRange inRange);
 };
 
 #endif
