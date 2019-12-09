@@ -18,7 +18,8 @@ private:
   // loaded from disk
   uint8_t bitPower;
   uint64_t binSize;
-  char *bwt;
+  uint64_t fsize;
+  uint8_t * bwt;
 
   // constructFMIndex() - IMPORTANT: THIS IS TRANSPOSED COMPARED TO PYTHON IMPL
   // aka row = symbol; column = index
@@ -33,7 +34,7 @@ private:
   void constructFMIndex();
 
 public:
-  uint64_t size;
+  uint64_t bsize;
   // constructor and destructor
   RLE_MMAP(string inFN, uint8_t bitPower = 8);
   ~RLE_MMAP();

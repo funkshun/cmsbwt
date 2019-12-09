@@ -1,4 +1,3 @@
-
 // C headers
 #include <fcntl.h>
 #include <math.h>
@@ -12,6 +11,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <stdexcept>
 
 // Custom headers
 #include "rle_mmap.h"
@@ -19,7 +19,7 @@
 
 using namespace std;
 
-RLE_MMAP::RLE_MMAP(string inFN, uint8_t bitPower, bool useMmap) {
+RLE_MMAP::RLE_MMAP(string inFN, uint8_t bitPower) {
 
   // set bwt attributes
   this->bwtFN = inFN;
@@ -30,28 +30,43 @@ RLE_MMAP::RLE_MMAP(string inFN, uint8_t bitPower, bool useMmap) {
   struct stat bwt_st;
   stat(this->bwtFN.c_str(), &bwt_st);
 
-  // get the file handle
-  int fd = open(inFN.c_str(), O_RDONLY);
-  char *mapped = (char *)mmap(0, bwt_st.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
-  close(fd);
+  // Basic load from comp_msbwt.npy file:
+  if (bwt_st.st_mode & S_IFREG){
+    
+    this->fsize = bwt_st.st_size;
 
-  // Header skipping magic
-  uint16_t headerLen = mapped[8] + 256 * (int)mapped[9];
-  uint16_t skipBytes = headerLen + 10;
-  if (skipBytes % 16 != 0) {
-    skipBytes = ((skipBytes / 16) + 1) * 16;
+
+    // get the file handle
+    int fd = open(bwtFN.c_str(), O_RDONLY);
+    uint8_t *mapped = (uint8_t *)mmap(0, bwt_st.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
+    close(fd);
+
+    // Header skipping magic
+    uint16_t headerLen = mapped[8] + 256 * (int)mapped[9];
+    uint16_t skipBytes = headerLen + 10;
+    if (skipBytes % 16 != 0) {
+      skipBytes = ((skipBytes / 16) + 1) * 16;
+    }
+
+    // advance the pointer and store
+    this->bsize = bwt_st.st_size - skipBytes;
+    this->bwt = mapped + skipBytes;
+
+    // first get the total symbol counts
+    this->constructTotalCounts();
+    // build some auxiliary indices
+    this->constructIndexing();
+    // now build the FM-index
+    this->constructFMIndex();
   }
-
-  // advance the pointer and store
-  this->size = bwt_st.st_size - skipBytes;
-  this->bwt = mapped + skipBytes;
-
-  // first get the total symbol counts
-  this->constructTotalCounts();
-  // build some auxiliary indices
-  this->constructIndexing();
-  // now build the FM-index
-  this->constructFMIndex();
+  // Load with prebuilt data structures
+  else if (bwt_st.st_mode & S_IFDIR) {
+    //unimplemented
+  }
+  // Unrecognized File Type
+  else {
+    throw std::invalid_argument("Unrecognized file type received.");
+  }
 }
 
 void RLE_MMAP::constructFMIndex() {
@@ -81,7 +96,7 @@ void RLE_MMAP::constructFMIndex() {
   }
 
   // go through each run in the BWT and set FM-indices as we go
-  uint64_t numBytes = this->size;
+  uint64_t numBytes = this->bsize;
   for (uint64_t x = 0; x < numBytes; x++) {
     currentChar = this->bwt[x] & MASK;
     if (currentChar == prevChar) {
@@ -139,7 +154,7 @@ RLE_MMAP::~RLE_MMAP() {
     delete this->fmIndex[x];
   }
   delete this->fmIndex;
-  munmap(this->bwt, this->size);
+  // munmap(this->bwt, this->fsize);
 }
 
 bwtRange RLE_MMAP::constrainRange(uint8_t sym, bwtRange inRange) {
@@ -233,7 +248,7 @@ void RLE_MMAP::constructTotalCounts() {
   uint8_t prevChar = 255;
   uint8_t currentChar;
   uint64_t powerMultiple = 1;
-  uint64_t bwtSize = this->size;
+  uint64_t bwtSize = this->bsize;
   uint64_t currentCount;
 
   // go through each run and add the symbol counts
