@@ -9,9 +9,9 @@
 
 // C++ headers
 #include <fstream>
+#include <stdexcept>
 #include <string>
 #include <vector>
-#include <stdexcept>
 
 // Custom headers
 #include "rle_mmap.h"
@@ -31,14 +31,14 @@ RLE_MMAP::RLE_MMAP(string inFN, uint8_t bitPower) {
   stat(this->bwtFN.c_str(), &bwt_st);
 
   // Basic load from comp_msbwt.npy file:
-  if (bwt_st.st_mode & S_IFREG){
-    
-    this->fsize = bwt_st.st_size;
+  if (bwt_st.st_mode & S_IFREG) {
 
+    this->fsize = bwt_st.st_size;
 
     // get the file handle
     int fd = open(bwtFN.c_str(), O_RDONLY);
-    uint8_t *mapped = (uint8_t *)mmap(0, bwt_st.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
+    uint8_t *mapped =
+        (uint8_t *)mmap(0, bwt_st.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
     close(fd);
 
     // Header skipping magic
@@ -61,7 +61,7 @@ RLE_MMAP::RLE_MMAP(string inFN, uint8_t bitPower) {
   }
   // Load with prebuilt data structures
   else if (bwt_st.st_mode & S_IFDIR) {
-    //unimplemented
+    // unimplemented
   }
   // Unrecognized File Type
   else {

@@ -19,7 +19,7 @@ private:
   uint8_t bitPower;
   uint64_t binSize;
   uint64_t fsize;
-  uint8_t * bwt;
+  uint8_t *bwt;
 
   // constructFMIndex() - IMPORTANT: THIS IS TRANSPOSED COMPARED TO PYTHON IMPL
   // aka row = symbol; column = index
